@@ -1,0 +1,11 @@
+product_id,nombre,categoria,unidad,stock_actual,fecha_expiracion
+P001,Leche en botella,Lácteos,unidad,58,2026-03-08
+P002,Yogur individual,Lácteos,unidad,45,2026-03-15
+P003,Pan empacado,Panadería,unidad,75,2026-03-06
+P004,Arroz en paquete,Abarrotes,unidad,51,2026-08-28
+P005,Azúcar en paquete,Abarrotes,unidad,36,2026-08-28
+P006,Aceite en botella,Abarrotes,unidad,55,2026-08-28
+P007,Atún en lata,Abarrotes,unidad,37,2027-03-01
+P008,Agua en botella,Bebidas,unidad,65,2026-08-28
+P009,Jugo en caja,Bebidas,unidad,90,2026-05-30
+P010,Detergente en bolsa,Limpieza,unidad,32,2027-03-01

@@ -1,0 +1,11 @@
+product_id,nombre,unidad,fecha,stock_predicho
+P001,Leche en botella,unidad,2026-03-02,69.64
+P002,Yogur individual,unidad,2026-03-02,53.38
+P003,Pan empacado,unidad,2026-03-02,87.86
+P004,Arroz en paquete,unidad,2026-03-02,57.51
+P005,Azúcar en paquete,unidad,2026-03-02,43.64
+P006,Aceite en botella,unidad,2026-03-02,63.72
+P007,Atún en lata,unidad,2026-03-02,44.48
+P008,Agua en botella,unidad,2026-03-02,80.95
+P009,Jugo en caja,unidad,2026-03-02,102.76
+P010,Detergente en bolsa,unidad,2026-03-02,37.08

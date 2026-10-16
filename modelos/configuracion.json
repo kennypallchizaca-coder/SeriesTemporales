@@ -1,0 +1,61 @@
+{
+  "modelo": "FE: 7 días",
+  "n_dias": 7,
+  "ingenieria": true,
+  "epocas": 50,
+  "columnas": [
+    "stock_cierre",
+    "producto_P001",
+    "producto_P002",
+    "producto_P003",
+    "producto_P004",
+    "producto_P005",
+    "producto_P006",
+    "producto_P007",
+    "producto_P008",
+    "producto_P009",
+    "producto_P010",
+    "dia_semana_siguiente",
+    "mes_siguiente",
+    "dia_mes_siguiente",
+    "fin_semana_siguiente",
+    "feriado_siguiente",
+    "stock_x_fin_semana",
+    "stock_x_feriado"
+  ],
+  "codigos": [
+    "P001",
+    "P002",
+    "P003",
+    "P004",
+    "P005",
+    "P006",
+    "P007",
+    "P008",
+    "P009",
+    "P010"
+  ],
+  "ultima_fecha": "2026-03-01",
+  "feriados_hipoteticos": [
+    "2026-01-06",
+    "2026-01-26",
+    "2026-02-16",
+    "2026-02-25"
+  ],
+  "variable_objetivo": "stock_cierre",
+  "reposicion": "diaria hasta el nivel observado",
+  "niveles_reposicion": {
+    "P001": 96,
+    "P002": 72,
+    "P003": 120,
+    "P004": 80,
+    "P005": 60,
+    "P006": 88,
+    "P007": 64,
+    "P008": 112,
+    "P009": 140,
+    "P010": 48
+  },
+  "semilla": 42,
+  "tensorflow": "2.20.0"
+}
