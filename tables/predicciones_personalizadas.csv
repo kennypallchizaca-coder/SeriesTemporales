@@ -1,0 +1,125 @@
+fecha,product_id,producto,unidad,demanda,stock_cierre
+2026-10-01,114674,Pollo Entero Fresco,kg,33.23,41.27
+2026-10-01,135432,Lomo Fino de Res,kg,10.46,12.74
+2026-10-01,103665,Pan de Molde Blanco,unidad,39.0,63.0
+2026-10-01,108701,Tomate Riñón Fresco,kg,36.08,83.92
+2026-10-02,114674,Pollo Entero Fresco,kg,34.46,65.54
+2026-10-02,135432,Lomo Fino de Res,kg,11.19,20.81
+2026-10-02,103665,Pan de Molde Blanco,unidad,40.0,100.0
+2026-10-02,108701,Tomate Riñón Fresco,kg,37.19,46.72
+2026-10-03,114674,Pollo Entero Fresco,kg,42.37,23.17
+2026-10-03,135432,Lomo Fino de Res,kg,15.22,5.59
+2026-10-03,103665,Pan de Molde Blanco,unidad,48.0,53.0
+2026-10-03,108701,Tomate Riñón Fresco,kg,41.42,78.58
+2026-10-04,114674,Pollo Entero Fresco,kg,42.47,57.53
+2026-10-04,135432,Lomo Fino de Res,kg,15.94,16.06
+2026-10-04,103665,Pan de Molde Blanco,unidad,48.0,92.0
+2026-10-04,108701,Tomate Riñón Fresco,kg,42.41,36.17
+2026-10-05,114674,Pollo Entero Fresco,kg,30.69,26.84
+2026-10-05,135432,Lomo Fino de Res,kg,9.05,7.01
+2026-10-05,103665,Pan de Molde Blanco,unidad,37.0,55.0
+2026-10-05,108701,Tomate Riñón Fresco,kg,34.62,85.38
+2026-10-06,114674,Pollo Entero Fresco,kg,30.53,69.47
+2026-10-06,135432,Lomo Fino de Res,kg,8.63,23.37
+2026-10-06,103665,Pan de Molde Blanco,unidad,36.0,104.0
+2026-10-06,108701,Tomate Riñón Fresco,kg,35.82,49.56
+2026-10-07,114674,Pollo Entero Fresco,kg,32.25,37.22
+2026-10-07,135432,Lomo Fino de Res,kg,9.96,13.41
+2026-10-07,103665,Pan de Molde Blanco,unidad,38.0,66.0
+2026-10-07,108701,Tomate Riñón Fresco,kg,36.01,83.99
+2026-10-08,114674,Pollo Entero Fresco,kg,41.84,58.16
+2026-10-08,135432,Lomo Fino de Res,kg,16.49,15.51
+2026-10-08,103665,Pan de Molde Blanco,unidad,46.0,94.0
+2026-10-08,108701,Tomate Riñón Fresco,kg,43.52,40.48
+2026-10-09,114674,Pollo Entero Fresco,kg,39.72,18.44
+2026-10-09,135432,Lomo Fino de Res,kg,15.82,16.18
+2026-10-09,103665,Pan de Molde Blanco,unidad,44.0,50.0
+2026-10-09,108701,Tomate Riñón Fresco,kg,40.11,79.89
+2026-10-10,114674,Pollo Entero Fresco,kg,43.04,56.96
+2026-10-10,135432,Lomo Fino de Res,kg,17.23,0.0
+2026-10-10,103665,Pan de Molde Blanco,unidad,48.0,92.0
+2026-10-10,108701,Tomate Riñón Fresco,kg,43.24,36.65
+2026-10-11,114674,Pollo Entero Fresco,kg,43.73,13.22
+2026-10-11,135432,Lomo Fino de Res,kg,17.12,14.88
+2026-10-11,103665,Pan de Molde Blanco,unidad,48.0,44.0
+2026-10-11,108701,Tomate Riñón Fresco,kg,42.92,77.08
+2026-10-12,114674,Pollo Entero Fresco,kg,30.58,69.42
+2026-10-12,135432,Lomo Fino de Res,kg,9.6,22.4
+2026-10-12,103665,Pan de Molde Blanco,unidad,36.0,104.0
+2026-10-12,108701,Tomate Riñón Fresco,kg,35.42,41.66
+2026-10-13,114674,Pollo Entero Fresco,kg,31.72,37.71
+2026-10-13,135432,Lomo Fino de Res,kg,9.44,12.95
+2026-10-13,103665,Pan de Molde Blanco,unidad,37.0,67.0
+2026-10-13,108701,Tomate Riñón Fresco,kg,35.26,84.74
+2026-10-14,114674,Pollo Entero Fresco,kg,35.22,64.78
+2026-10-14,135432,Lomo Fino de Res,kg,12.16,19.84
+2026-10-14,103665,Pan de Molde Blanco,unidad,40.0,100.0
+2026-10-14,108701,Tomate Riñón Fresco,kg,37.73,47.0
+2026-10-15,114674,Pollo Entero Fresco,kg,38.06,26.73
+2026-10-15,135432,Lomo Fino de Res,kg,14.23,5.61
+2026-10-15,103665,Pan de Molde Blanco,unidad,43.0,57.0
+2026-10-15,108701,Tomate Riñón Fresco,kg,39.16,80.84
+2026-10-16,114674,Pollo Entero Fresco,kg,38.84,61.16
+2026-10-16,135432,Lomo Fino de Res,kg,15.08,16.92
+2026-10-16,103665,Pan de Molde Blanco,unidad,43.0,97.0
+2026-10-16,108701,Tomate Riñón Fresco,kg,40.09,40.76
+2026-10-17,114674,Pollo Entero Fresco,kg,44.41,16.75
+2026-10-17,135432,Lomo Fino de Res,kg,17.03,0.0
+2026-10-17,103665,Pan de Molde Blanco,unidad,48.0,48.0
+2026-10-17,108701,Tomate Riñón Fresco,kg,43.15,76.85
+2026-10-18,114674,Pollo Entero Fresco,kg,43.63,56.37
+2026-10-18,135432,Lomo Fino de Res,kg,16.99,15.01
+2026-10-18,103665,Pan de Molde Blanco,unidad,48.0,92.0
+2026-10-18,108701,Tomate Riñón Fresco,kg,43.07,33.77
+2026-10-19,114674,Pollo Entero Fresco,kg,31.45,24.92
+2026-10-19,135432,Lomo Fino de Res,kg,9.68,22.32
+2026-10-19,103665,Pan de Molde Blanco,unidad,36.0,56.0
+2026-10-19,108701,Tomate Riñón Fresco,kg,34.93,85.07
+2026-10-20,114674,Pollo Entero Fresco,kg,31.36,68.64
+2026-10-20,135432,Lomo Fino de Res,kg,9.53,12.78
+2026-10-20,103665,Pan de Molde Blanco,unidad,36.0,104.0
+2026-10-20,108701,Tomate Riñón Fresco,kg,35.62,49.45
+2026-10-21,114674,Pollo Entero Fresco,kg,33.42,35.22
+2026-10-21,135432,Lomo Fino de Res,kg,10.39,21.61
+2026-10-21,103665,Pan de Molde Blanco,unidad,38.0,66.0
+2026-10-21,108701,Tomate Riñón Fresco,kg,36.12,83.88
+2026-10-22,114674,Pollo Entero Fresco,kg,34.74,65.26
+2026-10-22,135432,Lomo Fino de Res,kg,11.94,9.67
+2026-10-22,103665,Pan de Molde Blanco,unidad,39.0,101.0
+2026-10-22,108701,Tomate Riñón Fresco,kg,37.4,46.48
+2026-10-23,114674,Pollo Entero Fresco,kg,36.48,28.78
+2026-10-23,135432,Lomo Fino de Res,kg,12.93,19.07
+2026-10-23,103665,Pan de Molde Blanco,unidad,40.0,61.0
+2026-10-23,108701,Tomate Riñón Fresco,kg,37.92,82.08
+2026-10-24,114674,Pollo Entero Fresco,kg,43.93,56.07
+2026-10-24,135432,Lomo Fino de Res,kg,17.14,1.93
+2026-10-24,103665,Pan de Molde Blanco,unidad,48.0,92.0
+2026-10-24,108701,Tomate Riñón Fresco,kg,43.18,38.9
+2026-10-25,114674,Pollo Entero Fresco,kg,44.35,11.72
+2026-10-25,135432,Lomo Fino de Res,kg,17.55,14.45
+2026-10-25,103665,Pan de Molde Blanco,unidad,48.0,44.0
+2026-10-25,108701,Tomate Riñón Fresco,kg,42.96,77.04
+2026-10-26,114674,Pollo Entero Fresco,kg,30.93,69.07
+2026-10-26,135432,Lomo Fino de Res,kg,9.95,22.05
+2026-10-26,103665,Pan de Molde Blanco,unidad,36.0,104.0
+2026-10-26,108701,Tomate Riñón Fresco,kg,35.51,41.52
+2026-10-27,114674,Pollo Entero Fresco,kg,31.94,37.13
+2026-10-27,135432,Lomo Fino de Res,kg,9.75,12.3
+2026-10-27,103665,Pan de Molde Blanco,unidad,37.0,67.0
+2026-10-27,108701,Tomate Riñón Fresco,kg,35.26,84.74
+2026-10-28,114674,Pollo Entero Fresco,kg,32.88,67.12
+2026-10-28,135432,Lomo Fino de Res,kg,10.34,21.66
+2026-10-28,103665,Pan de Molde Blanco,unidad,38.0,102.0
+2026-10-28,108701,Tomate Riñón Fresco,kg,36.28,48.46
+2026-10-29,114674,Pollo Entero Fresco,kg,37.14,29.97
+2026-10-29,135432,Lomo Fino de Res,kg,13.61,8.06
+2026-10-29,103665,Pan de Molde Blanco,unidad,42.0,61.0
+2026-10-29,108701,Tomate Riñón Fresco,kg,38.16,81.84
+2026-10-30,114674,Pollo Entero Fresco,kg,38.36,61.64
+2026-10-30,135432,Lomo Fino de Res,kg,14.75,17.25
+2026-10-30,103665,Pan de Molde Blanco,unidad,43.0,97.0
+2026-10-30,108701,Tomate Riñón Fresco,kg,39.64,42.2
+2026-10-31,114674,Pollo Entero Fresco,kg,46.53,15.12
+2026-10-31,135432,Lomo Fino de Res,kg,18.96,0.0
+2026-10-31,103665,Pan de Molde Blanco,unidad,51.0,47.0
+2026-10-31,108701,Tomate Riñón Fresco,kg,44.33,75.67

@@ -1,0 +1,144 @@
+{
+  "modelo": "LSTM con FE: 7 días",
+  "n_dias": 7,
+  "ingenieria": true,
+  "epocas": 19,
+  "columnas": [
+    "cantidad_vendida",
+    "prod_103665",
+    "prod_105574",
+    "prod_108634",
+    "prod_108701",
+    "prod_114674",
+    "prod_119024",
+    "prod_121528",
+    "prod_123601",
+    "prod_126938",
+    "prod_135432",
+    "cat_Abarrotes",
+    "cat_Cárnicos",
+    "cat_Frutas y Verduras",
+    "cat_Limpieza",
+    "cat_Lácteos y Huevos",
+    "cat_Panadería",
+    "stock_dia_anterior",
+    "media_movil_7",
+    "venta_hace_7_dias",
+    "dia_semana",
+    "mes",
+    "semana_ano",
+    "fin_de_semana",
+    "es_feriado",
+    "vispera_feriado",
+    "dia_pago",
+    "temporada_navidad"
+  ],
+  "ultima_fecha": "2026-09-30",
+  "horizonte_max_dias": 60,
+  "codigos": [
+    "103665",
+    "105574",
+    "108634",
+    "108701",
+    "114674",
+    "119024",
+    "121528",
+    "123601",
+    "126938",
+    "135432"
+  ],
+  "productos_info": {
+    "103665": {
+      "nombre": "Pan de Molde Blanco",
+      "categoria": "Panadería",
+      "unidad": "unidad"
+    },
+    "105574": {
+      "nombre": "Arroz Flor Blanco 1kg",
+      "categoria": "Abarrotes",
+      "unidad": "unidad"
+    },
+    "108634": {
+      "nombre": "Leche Entera Tetrapack 1L",
+      "categoria": "Lácteos y Huevos",
+      "unidad": "unidad"
+    },
+    "108701": {
+      "nombre": "Tomate Riñón Fresco",
+      "categoria": "Frutas y Verduras",
+      "unidad": "kg"
+    },
+    "114674": {
+      "nombre": "Pollo Entero Fresco",
+      "categoria": "Cárnicos",
+      "unidad": "kg"
+    },
+    "119024": {
+      "nombre": "Huevos Blancos Empaque 12u",
+      "categoria": "Lácteos y Huevos",
+      "unidad": "unidad"
+    },
+    "121528": {
+      "nombre": "Aceite Vegetal Palma 1L",
+      "categoria": "Abarrotes",
+      "unidad": "unidad"
+    },
+    "123601": {
+      "nombre": "Manzana Royal Gala",
+      "categoria": "Frutas y Verduras",
+      "unidad": "kg"
+    },
+    "126938": {
+      "nombre": "Detergente Multiuso 1kg",
+      "categoria": "Limpieza",
+      "unidad": "unidad"
+    },
+    "135432": {
+      "nombre": "Lomo Fino de Res",
+      "categoria": "Cárnicos",
+      "unidad": "kg"
+    }
+  },
+  "politica_reposicion": {
+    "103665": {
+      "punto_reorden": 70,
+      "nivel_maximo": 140
+    },
+    "105574": {
+      "punto_reorden": 80,
+      "nivel_maximo": 160
+    },
+    "108634": {
+      "punto_reorden": 90,
+      "nivel_maximo": 180
+    },
+    "108701": {
+      "punto_reorden": 60,
+      "nivel_maximo": 120
+    },
+    "114674": {
+      "punto_reorden": 50,
+      "nivel_maximo": 100
+    },
+    "119024": {
+      "punto_reorden": 60,
+      "nivel_maximo": 120
+    },
+    "121528": {
+      "punto_reorden": 40,
+      "nivel_maximo": 80
+    },
+    "123601": {
+      "punto_reorden": 36,
+      "nivel_maximo": 72
+    },
+    "126938": {
+      "punto_reorden": 24,
+      "nivel_maximo": 48
+    },
+    "135432": {
+      "punto_reorden": 16,
+      "nivel_maximo": 32
+    }
+  }
+}

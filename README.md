@@ -1,487 +1,60 @@
-# Predicción de inventario y stock de un supermercado
+# Predicción de demanda y stock con LSTM — Supermercados La Favorita
 
-## 1. Descripción del trabajo
+Práctica 2 de Aprendizaje Automático: Aprendizaje profundo y series temporales.
 
-Esta práctica desarrolla una red neuronal recurrente LSTM para predecir cuánto stock quedará al cierre de un día futuro. El trabajo comprende la generación y preparación de los datos, el análisis exploratorio, la creación de características, el entrenamiento, la evaluación y la implementación de funciones de consulta.
+Una red LSTM predice la **demanda diaria** de 10 productos. El **stock al cierre** se calcula a partir de esa demanda con la regla de reposición de la tienda:
 
-Se utiliza un escenario sintético de 10 productos durante 60 días. La salida que aprende la red es el **stock al cierre del día**. Las ventas observadas sirven para construir ese historial de existencias; las funciones de consulta obtienen el stock futuro directamente de la salida de la LSTM.
+```
+LSTM → demanda(t) → stock_cierre(t) = stock_inicio(t) − demanda(t)
+```
 
-El desarrollo completo está en [Practica_Inventario_LSTM.ipynb](Practica_Inventario_LSTM.ipynb). La versión [Practica_Inventario_LSTM.html](Practica_Inventario_LSTM.html) permite leer el código, los gráficos y los resultados sin ejecutar el cuaderno.
-
-## 2. Objetivos
-
-El objetivo general es desarrollar y evaluar un modelo que estime el stock futuro de los productos de un supermercado a partir de su historial.
-
-Los objetivos específicos son:
-
-- Organizar y validar los datos de ventas e inventario.
-- Analizar las variables mediante estadísticas descriptivas y gráficos de su distribución y comportamiento temporal.
-- Crear características de calendario y variables combinadas relacionadas con el funcionamiento del negocio.
-- Preparar secuencias por producto para entrenar una red LSTM.
-- Comparar el desempeño antes y después de la ingeniería de características, y ajustar la ventana temporal.
-- Implementar una consulta individual y otra que devuelva un vector de stocks para una misma fecha.
-
-## 3. Organización de los archivos
+## Estructura
 
 ```text
-Practica_Inventario_LSTM.ipynb
-Practica_Inventario_LSTM.html
-README.md
+data/          inventory.csv, sales_history.csv (los genera el notebook)
+notebooks/     Practica_Inventario_LSTM.ipynb y su exportación .html
+models/        demanda_lstm.keras, escaladores.joblib, configuracion.json
+figures/       gráficas exportadas por el notebook
+tables/        métricas y predicciones exportadas
 requirements.txt
-data/
-    inventory.csv
-    sales_history.csv
-modelos/
-    stock_lstm.keras
-    escaladores.joblib
-    configuracion.json
-resultados/
-    graficos/
-        01_catalogo_stock.png
-        02_expiracion.png
-        03_distribuciones.png
-        04_evolucion_por_producto.png
-        05_ventas_totales.png
-        06_calendario.png
-        07_curvas_entrenamiento.png
-        08_comparacion_mse.png
-        09_predicciones_por_producto.png
-        10_variables_temporales.png
-        11_variables_combinadas.png
-    tablas/
-        control_calidad.csv
-        estadisticas_descriptivas.csv
-        estadisticas_por_producto.csv
-        historico_stock.csv
-        mapa_productos.csv
-        metricas_modelos.csv
-        metricas_por_producto.csv
-        predicciones_futuras.csv
-        predicciones_prueba.csv
 ```
 
-| Archivo o carpeta | Contenido y finalidad |
-|---|---|
-| Notebook | Explicaciones, código comentado, entrenamiento, comprobaciones y resultados ejecutados. |
-| HTML | Exportación del notebook para su lectura y presentación. |
-| `data` | Los dos CSV de entrada con la estructura solicitada. |
-| `modelos` | Red final, escaladores y configuración para recuperar el modelo. |
-| `resultados/graficos` | Once figuras del análisis y la evaluación. |
-| `resultados/tablas` | Estadísticas, métricas, historial de stock y predicciones exportadas. |
-| `requirements.txt` | Versiones de las bibliotecas utilizadas. |
+## Dataset
 
-Las funciones de predicción se encuentran dentro del notebook. Para utilizarlas deben haberse ejecutado las celdas anteriores.
+365 días (01/10/2025 – 30/09/2026), 3.650 registros, 10 productos en 6 categorías. Los datos son sintéticos y se generan en la sección 1 del notebook, con semilla 42:
 
-## 4. Datos utilizados y reglas de la simulación
+- Demanda con patrón semanal por categoría, feriados oficiales de Ecuador (librería `holidays`) y sus vísperas, días de pago (quincena y fin de mes), temporada navideña, tendencia leve y ruido.
+- Reposición con regla (s, S): si el cierre baja del punto de reorden, al día siguiente se repone hasta el nivel máximo.
+- Productos empacados en `unidad` (enteros) y productos a granel en `kg` (decimales).
 
-### Periodo y productos
+## Resultados (prueba: 01/09/2026 – 30/09/2026)
 
-El historial comprende del **1 de enero al 1 de marzo de 2026**, ambos incluidos. Hay 10 observaciones por día, una por producto, para un total de 600 registros.
+| Modelo | RMSE demanda | MAE demanda |
+|---|---:|---:|
+| LSTM sin FE, 7 días | 6,72 | 5,03 |
+| LSTM con FE, 3 días | 4,80 | 3,64 |
+| **LSTM con FE, 7 días (elegido)** | **4,40** | **3,10** |
+| LSTM con FE, 14 días | 6,36 | 4,33 |
+| Base: persistencia (venta de ayer) | 6,47 | 4,51 |
+| Base: promedio móvil 7 días | 5,64 | 4,11 |
+| Base: mismo día de la semana anterior | 4,39 | 3,29 |
 
-| Código | Producto | Categoría | Stock inicial diario después de reponer |
-|---|---|---|---:|
-| P001 | Leche en botella | Lácteos | 96 |
-| P002 | Yogur individual | Lácteos | 72 |
-| P003 | Pan empacado | Panadería | 120 |
-| P004 | Arroz en paquete | Abarrotes | 80 |
-| P005 | Azúcar en paquete | Abarrotes | 60 |
-| P006 | Aceite en botella | Abarrotes | 88 |
-| P007 | Atún en lata | Abarrotes | 64 |
-| P008 | Agua en botella | Bebidas | 112 |
-| P009 | Jugo en caja | Bebidas | 140 |
-| P010 | Detergente en bolsa | Limpieza | 48 |
+El modelo elegido se selecciona con el conjunto de validación (agosto de 2026).
 
-Una botella, paquete o pieza representa una unidad comercial. Todas las cantidades del ejercicio se expresan en estas unidades.
-
-### Generación de las ventas y reposición
-
-La simulación usa la semilla 42. Cada producto tiene una venta base a la que se añade variación aleatoria, un pequeño crecimiento durante el periodo y efectos de calendario:
-
-- El fin de semana añade un 40 % de la venta base.
-- Un feriado hipotético añade un 60 % de la venta base.
-- La tendencia añade 0,04 unidades por día transcurrido.
-- La variación aleatoria se genera con una distribución normal de media cero y desviación estándar de 2 unidades.
-
-La venta resultante se redondea a unidades enteras y se mantiene entre cero y el inventario disponible. Cada mañana se repone hasta cuatro veces la venta base. De esta manera, el stock inicial de un producto es constante y el stock de cierre varía según las ventas.
-
-Los cuatro feriados del escenario son el 6 y el 26 de enero, y el 16 y el 25 de febrero de 2026. Son fechas hipotéticas para estudiar su efecto; no representan el calendario oficial de una ubicación.
-
-Los nombres corresponden a productos habituales, pero las ventas, existencias, fechas de expiración y feriados son simulados. Los CSV no contienen transacciones reales de un supermercado.
-
-### Estructura de los CSV
-
-`data/inventory.csv` contiene una fila por producto:
-
-| Variable | Significado |
-|---|---|
-| `product_id` | Código único del producto. |
-| `nombre` | Nombre del producto. |
-| `categoria` | Grupo al que pertenece. |
-| `unidad` | Unidad comercial en que se cuentan las existencias. |
-| `stock_actual` | Existencias al cierre del último día del historial. |
-| `fecha_expiracion` | Fecha de expiración del lote disponible en ese último cierre. |
-
-`data/sales_history.csv` contiene una fila por producto y fecha:
-
-| Variable | Significado |
-|---|---|
-| `product_id` | Código que relaciona la venta con el inventario. |
-| `nombre` | Nombre del producto. |
-| `fecha_venta` | Día del registro. |
-| `cantidad_vendida` | Unidades vendidas durante ese día. |
-| `stock_en_momento` | Existencias al inicio del día, después de reponer y antes de vender. |
-
-## 5. Construcción de la variable objetivo
-
-Dentro del notebook se calcula:
+## Funciones de predicción
 
 ```python
-ventas["stock_cierre"] = ventas["stock_en_momento"] - ventas["cantidad_vendida"]
+predecir_demanda("114674", "2026-10-01")   # 33.23  (kg -> float)
+predecir_demanda_todos("2026-10-01")       # lista en el orden de CODIGOS
+predecir_stock("103665", "2026-10-01")     # 63     (unidad -> int)
+predecir_stock_todos("2026-10-01")
 ```
 
-Este cálculo reconstruye el stock histórico a partir de cantidades ya observadas. No modifica las columnas de los CSV de entrada. El historial derivado se exporta a `resultados/tablas/historico_stock.csv`.
+Las fechas deben estar entre el día siguiente al último dato y **60 días después** (hasta el 29/11/2026). Más allá de un día la predicción es recursiva y el error se acumula.
 
-Se utiliza el stock de cierre porque muestra cuánto queda después de vender. El stock inicial se mantiene fijo dentro de cada producto debido a la reposición de la simulación, por lo que no describe esa variación diaria.
+## Ejecución
 
-Por ejemplo, en el último registro de P001 había 96 unidades al inicio y se vendieron 38. El stock de cierre fue de 58 unidades, que coincide con su `stock_actual` en el inventario.
-
-En el aprendizaje supervisado:
-
-- **X** contiene stocks anteriores, la identificación del producto y, en la versión ampliada, características de calendario.
-- **y** contiene el stock de cierre del día que se quiere predecir.
-
-La cantidad vendida del día objetivo se utiliza para conocer su stock histórico y evaluar la predicción, pero no se entrega a la red como una entrada de ese mismo día.
-
-## 6. Carga, revisión y limpieza
-
-Se leen ambos archivos con pandas y se revisan sus primeras filas, dimensiones y tipos de datos. Después se aplican los siguientes controles:
-
-1. Detección de valores ausentes y duplicados exactos.
-2. Eliminación de espacios en los textos y duplicados exactos.
-3. Conversión de fechas y cantidades a sus tipos correspondientes.
-4. Validación de cantidades finitas, no negativas y registradas en unidades enteras.
-5. Comprobación de que cada código aparezca una sola vez en el inventario.
-6. Verificación de que los códigos y nombres coincidan entre los dos archivos.
-7. Detección de registros contradictorios para un mismo producto y fecha.
-8. Comprobación de que las ventas no superen el stock disponible.
-9. Ordenación y revisión de la continuidad diaria del historial por producto.
-10. Comparación del stock actual con el saldo del último registro de ventas.
-
-En esta ejecución se encontraron 10 productos y 600 registros, sin valores ausentes ni duplicados exactos. No fue necesario imputar cantidades ni eliminar observaciones. Un valor ausente no se convierte automáticamente en cero, porque la ausencia de un registro y una venta de cero tienen significados diferentes.
-
-También se verifica que el nivel de reposición diario sea fijo dentro de cada producto, condición del escenario utilizado. Los controles de calidad se guardan en `control_calidad.csv`.
-
-## 7. Análisis exploratorio y estadísticas descriptivas
-
-Se calcularon el número de observaciones, la media, la desviación estándar, los cuartiles y los valores mínimo y máximo. Las existencias actuales se resumen desde el inventario para evitar contarlas repetidamente por cada fecha.
-
-| Estadística | Cantidad vendida | Stock inicial | Stock al cierre |
-|---|---:|---:|---:|
-| Registros | 600 | 600 | 600 |
-| Media | 26,66 | 88,00 | 61,34 |
-| Desviación estándar | 9,68 | 27,68 | 20,34 |
-| Mínimo | 9 | 48 | 25 |
-| Mediana | 25 | 84 | 59 |
-| Máximo | 61 | 140 | 108 |
-
-La media de stock al cierre combina productos con diferentes niveles de reposición. Por eso también se calculan estadísticas por producto. Una venta mayor deja menos existencias al final del día, mientras que un nivel de reposición mayor permite mantener más inventario.
-
-Los códigos y nombres se usan para identificar las series. Categoría y unidad describen el catálogo; no se interpretan como cantidades numéricas que deban promediarse.
-
-### Visualizaciones realizadas
-
-| Figura | Qué permite observar |
-|---|---|
-| `01_catalogo_stock.png` | Stock actual por código y nombre, número de productos por categoría y unidad comercial. |
-| `02_expiracion.png` | Días restantes del lote actual hasta su fecha de expiración. |
-| `03_distribuciones.png` | Distribución de las ventas, del stock inicial y del stock de cierre. |
-| `04_evolucion_por_producto.png` | Evolución diaria de ventas y existencias para cada producto, con los feriados señalados. |
-| `05_ventas_totales.png` | Ventas y stock total al cierre a lo largo del periodo. |
-| `06_calendario.png` | Relación del stock medio con el día de semana, el fin de semana y los feriados. |
-| `07_curvas_entrenamiento.png` | Pérdida de entrenamiento y validación durante las épocas. |
-| `08_comparacion_mse.png` | Comparación del MSE de los modelos y de la persistencia. |
-| `09_predicciones_por_producto.png` | Stock observado y predicho en las fechas de prueba de cada producto. |
-| `10_variables_temporales.png` | Distribución del mes y del día del mes utilizados como características. |
-| `11_variables_combinadas.png` | Distribución del stock combinado con los indicadores de fin de semana y feriado. |
-
-Las figuras incluyen título, nombres de ejes, unidades cuando corresponden y leyendas para identificar las series. Los atributos fijos del catálogo y la fecha de expiración del inventario se representan como información del cierre, porque no existe un historial de sus cambios.
-
-## 8. Ingeniería de características
-
-La versión básica usa el stock anterior y diez columnas 0/1 que identifican los productos. Esta codificación evita interpretar los códigos como cantidades ordenadas: P010 no representa diez veces el valor de P001.
-
-La versión ampliada incorpora siete características:
-
-| Característica | Interpretación |
-|---|---|
-| `dia_semana_siguiente` | Día de la semana de la fecha siguiente: 0 corresponde a lunes y 6 a domingo. |
-| `mes_siguiente` | Mes de esa fecha. |
-| `dia_mes_siguiente` | Día del mes de esa fecha. |
-| `fin_semana_siguiente` | Vale 1 si la fecha siguiente es sábado o domingo. |
-| `feriado_siguiente` | Vale 1 si la fecha siguiente está en el calendario hipotético. |
-| `stock_x_fin_semana` | Stock observado multiplicado por el indicador de fin de semana siguiente. |
-| `stock_x_feriado` | Stock observado multiplicado por el indicador de feriado siguiente. |
-
-Estas variables relacionan el historial con condiciones que pueden cambiar las ventas y el stock restante. El calendario del día siguiente se conoce antes de realizar la consulta. Así, desde el cierre del viernes se puede indicar que la fecha siguiente es sábado sin conocer sus ventas.
-
-La versión básica tiene 11 variables de entrada: un stock y diez indicadores de producto. La versión ampliada tiene 18: las 11 anteriores y las siete características nuevas.
-
-El nombre y la categoría no se añaden como predictores independientes porque el código ya identifica cada producto del catálogo. Tampoco se repite `stock_actual` en fechas anteriores, pues solo corresponde al último cierre. La fecha de expiración se analiza, pero no se convierte en una regla de agotamiento futuro porque faltan datos de los lotes que se reponen.
-
-## 9. Separación temporal, normalización y secuencias
-
-### Particiones por fecha
-
-| Partición | Periodo | Días | Uso |
-|---|---|---:|---|
-| Entrenamiento | 01/01/2026 al 11/02/2026 | 42 | Ajustar los escaladores y los pesos de los modelos evaluados. |
-| Validación | 12/02/2026 al 20/02/2026 | 9 | Elegir la ventana temporal y la mejor época. |
-| Prueba | 21/02/2026 al 01/03/2026 | 9 | Medir el desempeño después de seleccionar la configuración. |
-
-La separación conserva el orden temporal. No se mezclan aleatoriamente observaciones de fechas futuras con las de entrenamiento.
-
-### Normalización
-
-Se usa `MinMaxScaler` para transformar las entradas y la salida. Hay un escalador para X y otro para y. Durante la comparación de modelos, ambos se ajustan únicamente con los datos de entrenamiento; después se aplican a validación y prueba.
-
-El escalador de y permite devolver las predicciones a unidades de stock antes de calcular MSE y RMSE. De esta forma, las métricas no quedan expresadas en valores normalizados.
-
-### Construcción de las secuencias
-
-La función `series_to_supervised` organiza los días anteriores como entrada y el día actual como salida. Las secuencias se crean por separado para cada producto, de modo que una ventana nunca combine el historial de dos códigos distintos.
-
-Con una ventana de tres días, por ejemplo, se utiliza la información de los días `t-3`, `t-2` y `t-1` para estimar el stock de `t`.
-
-La entrada de la LSTM tiene tres dimensiones:
-
-```text
-[muestras, días de la ventana, variables de entrada]
-```
-
-Para la configuración seleccionada, con siete días y 18 variables, las muestras de entrenamiento tienen forma `(350, 7, 18)`. Validación y prueba tienen 90 muestras cada una. Los primeros siete días de cada producto sirven como contexto y no generan una salida supervisada propia para esa ventana.
-
-## 10. Red neuronal y ajuste del modelo
-
-La arquitectura utiliza una capa LSTM de 50 neuronas y una capa Dense de una salida. La LSTM procesa la secuencia temporal; la capa final entrega una estimación continua del stock.
-
-| Parámetro | Configuración |
-|---|---|
-| Capa recurrente | LSTM de 50 neuronas |
-| Salida | Dense de una neurona |
-| Optimizador | Adam |
-| Pérdida de entrenamiento | MAE |
-| Métrica observada para la parada temprana | MSE de validación |
-| Máximo de épocas | 50 |
-| Tamaño de lote | 72 |
-| Paciencia de parada temprana | 10 épocas sin mejora |
-| Mezcla de muestras durante el entrenamiento | Desactivada |
-| Semilla | 42 |
-
-La pérdida MAE se utiliza para ajustar los pesos. MSE y RMSE se emplean para evaluar el desempeño en unidades originales. La parada temprana recupera los pesos de la mejor época según el MSE de validación.
-
-Se entrenaron cuatro configuraciones:
-
-1. Ventana de un día sin las nuevas características.
-2. Ventana de un día con ingeniería de características.
-3. Ventana de tres días con ingeniería de características.
-4. Ventana de siete días con ingeniería de características.
-
-La comparación entre las dos primeras mantiene la ventana de un día para estudiar el efecto de las variables añadidas. El ajuste posterior cambia la longitud de la ventana y conserva la arquitectura.
-
-## 11. Evaluación y resultados
-
-### Métricas
-
-El MSE es el promedio de los errores al cuadrado y el RMSE es su raíz:
-
-```text
-MSE = promedio((stock_observado - stock_predicho)²)
-RMSE = raíz cuadrada del MSE
-```
-
-El MSE se expresa en unidades al cuadrado y penaliza más los errores grandes. El RMSE se expresa en unidades de stock. Un RMSE de 2,4468 no es un porcentaje ni significa que cada predicción tenga exactamente ese error.
-
-También se evaluó la persistencia: usar el stock del día anterior como predicción del siguiente. Esta referencia permite comparar la red con una alternativa sencilla.
-
-### Resultados de la ejecución
-
-| Modelo | MSE de validación | MSE de prueba | RMSE de prueba | Mejor época |
-|---|---:|---:|---:|---:|
-| Base: 1 día sin ingeniería | 34,5267 | 53,6126 | 7,3221 | 32 |
-| Con ingeniería: 1 día | 6,6602 | 7,2104 | 2,6852 | 50 |
-| Con ingeniería: 3 días | 5,6888 | 5,9357 | 2,4363 | 45 |
-| Con ingeniería: 7 días | 5,6384 | 5,9867 | 2,4468 | 50 |
-| Persistencia | No se utilizó para seleccionar la ventana | 76,2111 | 8,7299 | No aplica |
-
-Las cifras proceden de la ejecución guardada en el notebook y de los CSV de resultados.
-
-Con la misma ventana de un día, la ingeniería de características redujo el MSE de prueba de 53,6126 a 7,2104 unidades², una disminución del **86,55 %**. El calendario resulta útil en este escenario porque las reglas de generación incluyen cambios de ventas en fines de semana y feriados.
-
-La configuración elegida fue la de **siete días**, ya que obtuvo el menor MSE de validación: 5,6384. Su RMSE de prueba fue de **2,4468 unidades de stock**, frente a 8,7299 de persistencia.
-
-Aunque la ventana de tres días obtuvo un error de prueba ligeramente menor, la selección se mantiene en siete días porque se hizo con validación. Elegir otra configuración después de consultar la prueba usaría esos mismos datos para decidir y evaluar.
-
-### Cómo se interpretó la prueba
-
-La evaluación predice un día hacia adelante con origen móvil. Para cada fecha se utilizan las existencias observadas hasta el día anterior, incluso cuando ese día anterior pertenece al periodo de prueba. Esto representa una consulta diaria después de cerrar el inventario.
-
-No equivale a pronosticar los nueve días de prueba de una sola vez. En una consulta a varios días, las funciones deben incorporar sus propias predicciones como historial y el error puede acumularse.
-
-Las métricas por producto y el sesgo se guardan en `metricas_por_producto.csv`. Un sesgo positivo representa sobreestimación media del stock y uno negativo representa subestimación.
-
-## 12. Reentrenamiento y archivos del modelo final
-
-Después de evaluar las configuraciones, se construyó una nueva red con la ventana seleccionada de siete días y se entrenó durante 50 épocas con todo el historial disponible. Los escaladores también se ajustaron con los 60 días.
-
-Este reentrenamiento utiliza 530 secuencias: 53 por cada uno de los diez productos. Su finalidad es aprovechar la información disponible para las consultas posteriores al 1 de marzo.
-
-Los archivos guardados son:
-
-| Archivo | Contenido |
-|---|---|
-| `stock_lstm.keras` | Arquitectura y pesos de la red final. |
-| `escaladores.joblib` | Escaladores de entrada y salida. |
-| `configuracion.json` | Variable objetivo, ventana, columnas, códigos, semilla, calendario y niveles de reposición. |
-
-Las métricas de prueba de la sección anterior corresponden a los modelos evaluados con separación temporal. No se presentan como una evaluación independiente de la red reentrenada con los 60 días.
-
-Se comprobó que el modelo recuperado desde disco produce los mismos resultados que el modelo guardado. Esto prepara su reutilización local; no se implementó un servicio web ni un despliegue en nube.
-
-## 13. Funciones de predicción
-
-### Consulta de un producto
-
-```python
-stock = predecir_stock_producto("P001", "2026-03-02")
-print(stock)
-```
-
-Salida de la ejecución:
-
-```text
-69.64
-```
-
-La función recibe el código y una fecha posterior al cierre del historial. Obtiene las últimas observaciones del producto, crea las mismas características utilizadas durante el entrenamiento, aplica el escalador y consulta la red. Devuelve un `float` con dos decimales que representa el stock estimado al cierre de esa fecha.
-
-El resultado procede de la salida de stock de la LSTM. El valor de 69,64 unidades para P001 corresponde a la reposición diaria del escenario; no representa consumir únicamente las 58 unidades que quedaban en el último cierre sin volver a abastecerse.
-
-### Consulta de todos los productos
-
-```python
-vector = predecir_stock_todos("2026-03-02")
-print(vector)
-```
-
-Salida:
-
-```text
-[69.64, 53.38, 87.86, 57.51, 43.64, 63.72, 44.48, 80.95, 102.76, 37.08]
-```
-
-La función devuelve una lista de valores numéricos en el orden de `CODIGOS`, desde P001 hasta P010. La posición 0 corresponde a P001, la posición 1 a P002 y así sucesivamente. El archivo `mapa_productos.csv` contiene la posición, el código y el nombre para conservar esa relación.
-
-### Consulta de un lote
-
-También se puede indicar una lista de productos. El resultado conserva el orden indicado:
-
-```python
-lote = predecir_stock_todos("2026-03-02", productos=["P009", "P001"])
-print(lote)
-```
-
-Salida:
-
-```text
-[102.76, 69.64]
-```
-
-### Fechas a varios días
-
-```python
-stock = predecir_stock_producto("P001", "2026-03-04")
-print(stock)
-```
-
-Salida registrada:
-
-```text
-70.29
-```
-
-Para llegar al 4 de marzo, la función calcula primero el stock del 2 de marzo, lo incorpora al historial y continúa con el 3 y el 4. Durante esos pasos se conserva el valor sin redondear; el retorno final se presenta con dos decimales.
-
-Los stocks se limitan entre cero y el nivel de reposición de cada producto. La misma regla se aplica en evaluación y en las consultas.
-
-Las fechas deben ser textos con formato `YYYY-MM-DD` y ser posteriores al 1 de marzo de 2026. La función rechaza códigos desconocidos, fechas inexistentes, fechas históricas y lotes vacíos o con códigos inválidos. También comprueba que exista suficiente historial para construir la ventana.
-
-## 14. Comprobaciones realizadas
-
-El notebook incluye aserciones para verificar:
-
-- Que el stock derivado no sea negativo y coincida con el inventario del último cierre.
-- Que las particiones respeten el orden de las fechas.
-- Que las ventanas contengan observaciones del mismo producto y que la salida esté alineada con el día siguiente.
-- Que desnormalizar la salida `y` permita recuperar los stocks observados.
-- Que la consulta individual devuelva un número y la general devuelva una lista de números.
-- Que los elementos del vector coincidan con las consultas individuales y respeten el orden de códigos.
-- Que un lote reordenado o con códigos repetidos conserve esa correspondencia.
-- Que los resultados respeten los límites del inventario del escenario.
-- Que las entradas incorrectas se rechacen.
-- Que la consulta del día siguiente coincida con la salida directa de la red.
-- Que el modelo y los escaladores se puedan recuperar desde los archivos guardados.
-
-Se ejecutaron las 17 celdas de código sin errores y se revisaron las once figuras. También se recuperó el modelo fuera de la ejecución del notebook y se comprobó que su vector de predicciones coincidiera con el CSV guardado.
-
-Estas comprobaciones verifican el funcionamiento del programa. La calidad predictiva se analiza con las métricas de prueba y sus límites.
-
-## 15. Cómo ejecutar y consultar la práctica
-
-### Leer los resultados
-
-Abrir `Practica_Inventario_LSTM.html` en el navegador. Esta versión contiene las explicaciones, el código y las salidas de la ejecución. No permite ejecutar las funciones.
-
-### Ejecutar en un entorno local
-
-1. Utilizar Python 3.12 y abrir una terminal en la raíz de la práctica.
-2. Instalar las bibliotecas:
-
-   ```bash
-   python -m pip install -r requirements.txt
-   ```
-
-3. Abrir `Practica_Inventario_LSTM.ipynb` en Jupyter o en un editor compatible con notebooks.
-4. Seleccionar el intérprete que contiene las bibliotecas y ejecutar las celdas en orden.
-5. Realizar las consultas después de la sección de funciones.
-
-Las bibliotecas principales son pandas y NumPy para los datos, Matplotlib para los gráficos, scikit-learn para la normalización y las métricas, TensorFlow/Keras para la red y joblib para guardar los escaladores.
-
-### Ejecutar en Google Colab
-
-Subir el notebook y ejecutar sus celdas en orden. Se pueden subir también los CSV a una carpeta llamada `data`. Si faltan, el cuaderno genera el escenario sintético. La instrucción de instalación incluida al inicio puede ejecutarse si faltan bibliotecas.
-
-GPU es opcional para este tamaño de datos. La ejecución registrada se realizó localmente en CPU; no se comprobó en Colab. Las versiones y el dispositivo pueden producir pequeñas diferencias entre entrenamientos, aunque se utilice la misma semilla.
-
-### Conservar o regenerar los archivos
-
-Si los CSV de entrada ya existen, el cuaderno los conserva y valida. Para regenerarlos se deben mover previamente ambos archivos a otra ubicación.
-
-Al ejecutar se actualizan los gráficos, las tablas y los archivos del modelo. Si se cambian los datos de entrada, es necesario volver a ejecutar el proceso completo para que la preparación, los escaladores, los pesos y los resultados correspondan al mismo historial.
-
-## 16. Alcance y limitaciones
-
-El modelo supone reposición diaria hasta el nivel observado para cada producto. Si el supermercado repone con otra frecuencia o cambia esas cantidades, se necesita modificar el escenario y volver a evaluar. El stock futuro puede subir o bajar entre días porque la simulación incluye abastecimiento diario.
-
-La fecha de expiración describe el lote del último cierre. No se dispone de las fechas de caducidad de los lotes futuros, por lo que el programa no calcula una retirada completa del stock por el vencimiento de ese lote. Tampoco se modelan promociones, precios, pérdidas u otras variables que no aparecen en los archivos.
-
-El historial tiene solo 60 días y la prueba incluye nueve fechas por producto. Los resultados describen esta simulación y no demuestran el mismo desempeño en un supermercado real. En los datos generados, el stock de cierre mínimo fue de 25 unidades; no se evaluaron casos observados de agotamiento total.
-
-La evaluación es diaria con observaciones anteriores disponibles. No se midió por separado la precisión de pronósticos recursivos largos. Las funciones permiten avanzar varias fechas, pero cada paso puede añadir error.
-
-## 17. Conclusiones
-
-El trabajo permitió organizar un problema de inventario como una regresión con series temporales. Se construyó un historial de stocks de cierre, se analizaron sus variaciones y se prepararon secuencias por producto sin utilizar información futura como entrada.
-
-La ingeniería de características redujo el error de prueba en la comparación con una misma ventana de un día. La validación seleccionó la ventana de siete días, que obtuvo un RMSE de 2,4468 unidades de stock y mejoró la persistencia dentro del escenario estudiado.
-
-Las dos funciones conectan el modelo con consultas de inventario: una devuelve el stock de un producto y otra entrega un vector ordenado para una misma fecha. Antes de utilizar estas predicciones para decidir compras, se requiere más historial y una validación con las políticas reales de reposición y caducidad.
+1. Python 3.12 y `python -m pip install -r requirements.txt`
+2. Abrir `notebooks/Practica_Inventario_LSTM.ipynb` **desde la carpeta `notebooks/`**, porque las rutas son relativas (`../data`, `../models`, ...).
+3. Ejecutar todas las celdas en orden (Restart & Run All). Tarda alrededor de 1 minuto en CPU.
+4. Para regenerar el HTML: `jupyter nbconvert --to html Practica_Inventario_LSTM.ipynb`
